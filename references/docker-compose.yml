@@ -1,0 +1,81 @@
+services:
+  ros2_humble_rviz2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USERNAME: ros-admin
+        USER_UID: ${HOST_UID:-1000}
+        USER_GID: ${HOST_GID:-1000}
+
+    image: ros2-humble-desktop:latest
+    container_name: ros2_humble_rviz2
+
+    stdin_open: true
+    tty: true
+
+    # ROS 2 DDS Networking
+    network_mode: host
+    ipc: host
+    
+    environment:
+      # X11 / Xwayland authentication
+      - XAUTHORITY=/home/ros-admin/.Xauthority
+      # ROS 2
+      - ROS_DOMAIN_ID=0
+      - ROS_LOCALHOST_ONLY=0
+
+      # X11 / Xwayland display
+      - DISPLAY=${DISPLAY}
+      - QT_QPA_PLATFORM=xcb
+      - QT_X11_NO_MITSHM=1
+
+    volumes:
+      # X11 authentication
+      - /home/renity-admin/.Xauthority:/home/ros-admin/.Xauthority:ro
+      # ROS2 Workspace, Avalue AMR
+      - /home/renity-admin/ros2_humble_workspace:/home/ros-admin/ros2_humble_workspace
+      - /home/renity-admin/ros2_humble_amr_avalue:/home/ros-admin/ros2_humble_amr_avalue
+
+      # Xwayland Display      
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+
+      # Host USB / V4L2 / Serial devices
+      - /dev:/dev
+
+    device_cgroup_rules:
+      # RealSense V4L2 Video Nodes
+      - 'c 81:* rmw'
+
+      # RealSense USB Devices
+      - 'c 189:* rmw'
+
+      # RPLIDAR USB Serial
+      - 'c 188:* rmw'
+
+      # STM32 / IMU ttyACM
+      - 'c 166:* rmw'
+
+    # Use numeric GIDs from the Host
+    # Replace these examples with the actual values.
+    group_add:
+      - "${DIALOUT_GID}"
+      - "${VIDEO_GID}"
+
+    working_dir: /home/ros-admin/ros2_humble_workspace
+
+    command:
+      - /bin/bash
+      - -lc
+      - |
+          source /opt/ros/humble/setup.bash
+          source /home/ros-admin/ros2_humble_amr_avalue/install/setup.bash
+          source /home/ros-admin/ros2_humble_workspace/install/setup.bash
+
+          ros2 launch realsense2_camera rs_launch.py enable_rgbd:=true enable_sync:=true align_depth.enable:=true enable_color:=true enable_depth:=true &
+          ros2 launch yesense_std_ros2 yesense_node.launch.py &
+          ros2 launch rosbridge_server rosbridge_websocket_launch.xml &
+          ros2 launch sllidar_ros2 sllidar_a2m12_launch.py &
+          ros2 launch turn_on_avalue_robot turn_on_avalue_robot.launch.py &
+
+          wait
