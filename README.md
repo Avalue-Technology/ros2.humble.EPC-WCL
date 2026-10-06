@@ -1,5 +1,5 @@
 # Introduction
-This article primarily introduces how to install ROS2 Humble Docker. We will take EPC-WCL provided by Avalue Technology Inc with Ubuntu 26.04.1 LTS to be an example.
+This article primarily introduces how to install ROS2 Humble on the EPC-WCL Ubuntu 26.04.1 LTS environment provided by Avalue Technology Inc.
 
 # Check Ubuntu 26.04.1 LTS GPU - Accelerated: yes
 ```bash
