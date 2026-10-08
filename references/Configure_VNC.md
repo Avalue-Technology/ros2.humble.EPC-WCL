@@ -33,7 +33,8 @@ sudo apt install -y \
   tigervnc-standalone-server tigervnc-common \
   novnc websockify
 
-# Package configuration > Configuring lightdm > Default display manager, please choose: gdm3  
+# Package configuration > Configuring lightdm > Default display manager, please choose: gdm3
+sudo dpkg-reconfigure gdm3
 ```
 
 Check the installed commands and package files.
@@ -125,6 +126,15 @@ Exit the `renity-admin` login shell if you entered it with `sudo -iu`.
 
 ```bash
 exit
+```
+
+Configure permissions.
+
+```bash
+sudo chmod 755 /home/renity-admin/.vnc/xstartup
+sudo chmod 600 /home/renity-admin/.Xauthority
+sudo chmod 700 /home/renity-admin/.vnc
+sudo chmod 600 /home/renity-admin/.vnc/passwd
 ```
 
 Ensure ownership is correct.

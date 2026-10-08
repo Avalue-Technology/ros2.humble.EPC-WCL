@@ -431,6 +431,7 @@ git clone https://github.com/Avalue-Technology/ros2.humble.amr.avalue.git .
 
 ## In the Docker Container - ros2_humble_rviz2
 ```bash
+sudo apt update
 cd ros2_humble_amr_avalue
 # Install Dependency 
 rosdep install --from-paths . --ignore-src -r -y
